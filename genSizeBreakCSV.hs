@@ -5,6 +5,7 @@ module Main where
 import Text.Printf
 import Control.Applicative
 import Control.Monad
+import Control.Exception (assert)
 
 data AgeCat
     = Adult
@@ -13,15 +14,24 @@ data AgeCat
 
 type Dist a = (a, Double)
 
+pSLEOne = (<= 1.0) . sum . map snd
+
 --TODO newtyping around demographic types
+--DEMOGRAPHICS
 regions = [("NA",0.7), ("EU",0.2), ("ASIA",0.1)]
 genders = [("Male", 0.5), ("Female", 0.5)]
 
-sizebreaks = zip [22, 22.5 .. 32] $ repeat 0.05
+--BREAKS
+adult_sizebreaks = zip [22, 22.5 .. 31.5] $ repeat 0.05
+children_age_breaks = zip [8..17] $ repeat 0.1
 
+--TOTALS
 total_adult = 500
+total_children = 500
 
-adult_categories = liftA3 (,,) regions genders sizebreaks
+--DISTRIBUTION BREAKS
+children_categories = liftA3 (,,) regions genders children_age_breaks
+adult_categories = liftA3 (,,) regions genders adult_sizebreaks
 
 show_cat :: (AgeCat, Int) -> (Dist String, Dist String, Dist Float) -> String
 show_cat (agc, total) ((region, r), (gender, g), (break, b)) = show agc <> " " <> region <> " " <> gender <> " " <> break_rep <> ", " <> dist_rep <> ", " <> dist_total_rep
@@ -38,8 +48,3 @@ main = do
     mapM_ putStrLn $ show_cat (Adult, total_adult) <$> adult_categories
     putStrLn ""
     mapM_ putStrLn $ show_cat (Child, total_children) <$> children_categories
-
-total_children = 500
-children_breaks = zip [8..18] $ repeat 0.1
-
-children_categories = liftA3 (,,) regions genders children_breaks
