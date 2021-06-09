@@ -34,14 +34,17 @@ children_categories = liftA3 (,,) regions genders children_age_breaks
 adult_categories = liftA3 (,,) regions genders adult_sizebreaks
 
 show_cat :: (AgeCat, Int) -> (Dist String, Dist String, Dist Float) -> String
-show_cat (agc, total) ((region, r), (gender, g), (break, b)) = show agc <> " " <> region <> " " <> gender <> " " <> break_rep <> ", " <> dist_rep <> ", " <> dist_total_rep
+show_cat (agc, total) ((region, r), (gender, g), (break, b)) = category_tag <> ", " <> dist_rep <> ", " <> dist_total_rep
     where
         distribution = r * g * b
-        dist_rep = printf "%.5f" distribution
+
+        dist_rep = printf "%.6f" distribution
         break_rep = case agc of
             Adult -> printf "%fcm" break
             Child -> "Age " <> (printf "%d" (floor break :: Int) :: String)
         dist_total_rep = printf "%.5f" (fromIntegral total * distribution)
+
+        category_tag = show agc <> " " <> region <> " " <> gender <> " " <> break_rep
 
 main :: IO ()
 main = do
