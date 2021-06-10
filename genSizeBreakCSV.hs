@@ -3,6 +3,8 @@
 module Main where
 
 import Text.Printf
+
+import Data.List
 import Control.Applicative
 import Control.Monad
 import Control.Exception (assert)
@@ -34,7 +36,8 @@ children_categories = liftA3 (,,) regions genders children_age_breaks
 adult_categories = liftA3 (,,) regions genders adult_sizebreaks
 
 show_cat :: (AgeCat, Int) -> (Dist String, Dist String, Dist Float) -> String
-show_cat (agc, total) ((region, r), (gender, g), (break, b)) = category_tag <> ", " <> dist_rep <> ", " <> dist_total_rep
+show_cat (agc, total) ((region, r), (gender, g), (break, b)) =
+    foldr (<>) "" $ intersperse ", " [category_tag, dist_rep, dist_total_rep]
     where
         distribution = r * g * b
 
